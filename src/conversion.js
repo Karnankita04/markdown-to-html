@@ -8,7 +8,7 @@ const extractTag = (symbol) => {
     "######": "h6", 
   };
 
-  return tags[symbol];
+  return tags[symbol] || "p";
 };
 
 const convertToElem = (tag, content, bodyContent) => {
@@ -37,8 +37,15 @@ const convert = (rawData) => {
   let htmlDoc = "";
 
   data.forEach((element) => {
-    const [symbol, ...content] = element.split(" ");
-    htmlDoc = convertToElem(extractTag(symbol), content.join(" "), bodyContent);
+    let content = element.split(" ");
+    const symbol = element.split(" ")[0];
+    const tag = extractTag(symbol);
+
+    if (tag !== "p") {
+      content = element.split(" ").slice(1);
+    }
+
+    htmlDoc = convertToElem(tag, content.join(" "), bodyContent);
   });
 
   return htmlDoc;
@@ -46,6 +53,7 @@ const convert = (rawData) => {
 
 const main = () => {
   const readmeData = Deno.readTextFileSync("src/sample.md");
+  // convert(readmeData);
   writeFile(convert(readmeData));
 };
 
